@@ -37,6 +37,38 @@ todo-api-ts/
 
 
 ---
+# 📁 todo-api-ts/
+
+- `Dockerfile` - Node.jsアプリ用Docker設定ファイル
+- `docker-compose.yml` - アプリ＆MySQL用のDocker Compose定義
+- `.dockerignore` - Dockerビルド時に無視するファイル設定
+- `package.json` - npmパッケージ定義＆スクリプト
+- `tsconfig.json` - TypeScriptの設定ファイル
+- `ormconfig.ts` - TypeORMのDB接続設定
+
+## 📁 src/
+
+- `index.ts` - アプリのエントリーポイント（Expressサーバー起動）
+
+### 📁 controllers/
+- `todoController.ts` - ルーティングから呼ばれるロジックを定義
+
+### 📁 services/
+- `todoService.ts` - DB操作などのビジネスロジックを実装
+
+### 📁 models/
+- `Todo.ts` - TypeORMのエンティティ（DBテーブルに対応）
+
+### 📁 routes/
+- `todoRoutes.ts` - `/api/todos` のルーティング設定
+
+### 📁 utils/
+- `errorHandler.ts` - 共通のエラーハンドリング処理
+
+
+
+
+---
 
 ### 🛠 Step 1：プロジェクト構成と TypeScript 導入
 
