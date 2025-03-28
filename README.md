@@ -11,30 +11,25 @@
 
 ---
 📁 プロジェクト構成（TypeORM対応版）
-pgsql
-Copy
-Edit
-
 todo-api-ts/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .dockerignore
 ├── package.json
 ├── tsconfig.json
-├── ormconfig.ts               ← TypeORM の設定ファイル
+├── ormconfig.ts                # TypeORM の設定ファイル
 └── src/
-    ├── index.ts               ← アプリのエントリーポイント
+    ├── index.ts                # アプリのエントリーポイント
     ├── controllers/
     │   └── todoController.ts
     ├── services/
     │   └── todoService.ts
     ├── models/
-    │   └── Todo.ts            ← TypeORM のエンティティ
+    │   └── Todo.ts             # TypeORM のエンティティ
     ├── routes/
     │   └── todoRoutes.ts
     └── utils/
         └── errorHandler.ts
-
 
 ---
 # 📁 todo-api-ts/
