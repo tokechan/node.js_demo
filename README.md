@@ -10,6 +10,33 @@
 以下は、**最小構成の TODO API（認証なし）を TypeScript + Docker 環境で作る流れ**です。
 
 ---
+📁 プロジェクト構成（TypeORM対応版）
+pgsql
+Copy
+Edit
+
+todo-api-ts/
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── package.json
+├── tsconfig.json
+├── ormconfig.ts               ← TypeORM の設定ファイル
+└── src/
+    ├── index.ts               ← アプリのエントリーポイント
+    ├── controllers/
+    │   └── todoController.ts
+    ├── services/
+    │   └── todoService.ts
+    ├── models/
+    │   └── Todo.ts            ← TypeORM のエンティティ
+    ├── routes/
+    │   └── todoRoutes.ts
+    └── utils/
+        └── errorHandler.ts
+
+
+---
 
 ### 🛠 Step 1：プロジェクト構成と TypeScript 導入
 
