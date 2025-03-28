@@ -11,6 +11,8 @@
 
 ---
 📁 プロジェクト構成（TypeORM対応版）
+
+```
 todo-api-ts/
 ├── Dockerfile
 ├── docker-compose.yml
@@ -30,6 +32,7 @@ todo-api-ts/
     │   └── todoRoutes.ts
     └── utils/
         └── errorHandler.ts
+```
 
 ---
 # 📁 todo-api-ts/
