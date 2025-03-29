@@ -1,9 +1,13 @@
-let todos: { id: number; text: string }[] = [];
+import { AppDataSource } from '../../ormconfig';
+import { Todo } from '../models/Todo';
 
-export const getAll = async () => todos;
+const todoRepo = AppDataSource.getRepository(Todo);
+
+export const getAll = async () => {
+    return await todoRepo.find();
+};
 
 export const create = async (text: string) => {
-    const todo = { id: Date.now(), text };
-    todos.push(todo);
-    return todo;
+   const todo = todoRepo.create({ text });
+   return await todoRepo.save(todo);
 };
