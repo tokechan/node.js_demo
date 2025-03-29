@@ -1,11 +1,9 @@
-import express from 'express';
-import { createTodo, getTodos,  } from '../controllers/todoController';
 import { Router } from 'express';
+import { getTodos, createTodo } from '../controllers/todoController';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Hello World' });
-});
+router.get('/', getTodos);
+router.post('/', createTodo);
 
 export default router;
