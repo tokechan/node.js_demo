@@ -1,10 +1,14 @@
-import { getTodos,  } from '../controllers/todoController';
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
+import { getTodos, createTodo, updateTodo, deleteTodo } from '../controllers/todoController';
+
+
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Hello World' });
-});
+router.get('/', getTodos);
+router.post('/', createTodo);
+router.put('/:id', updateTodo as RequestHandler);
+router.delete('/:id', deleteTodo as RequestHandler);
+
 
 export default router;
