@@ -15,12 +15,17 @@ export const getTodos = async (req: Request, res: Response) => {
 
 export const createTodo = async (req: Request, res: Response) => {
     try {
-        const todoRepository = AppDataSource.getRepository(Todo);
-        const todo = new Todo();
-        todo.text = req.body.text;
-        const newTodo = await todoRepository.save(todo);
-        res.status(201).json(newTodo);
+        const { title } = req.body;
+        const todoRepo = AppDataSource.getRepository(Todo);
+
+        const newTodo = new Todo();
+        newTodo.title = title;
+        newTodo.completed = false;
+
+        const saved = await todoRepo.save(newTodo);
+        res.status(201).json(saved);
     } catch (error) {
-        res.status(500).json({ message: "Error creating todo", error });
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create todo'});
     }
 };
