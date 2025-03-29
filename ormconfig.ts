@@ -1,5 +1,7 @@
+// MySQL への接続設定
+import 'reflect-metadata';
 import { DataSource } from "typeorm";
-import { Todo } from './src/models/Todo'
+import { Todo } from './src/models/Todo';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -10,4 +12,5 @@ export const AppDataSource = new DataSource({
     database: 'todo_db',
     entities: [Todo],
     synchronize: true,
+    logging: true,
 })
