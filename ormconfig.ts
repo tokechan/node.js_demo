@@ -3,6 +3,7 @@
 import 'reflect-metadata';
 import { DataSource } from "typeorm";
 import { Todo } from './src/models/Todo';
+import { User } from './src/models/User';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
     username: 'root',
     password: 'password',
     database: 'todo_db',
-    entities: [Todo],
+    entities: [Todo, User],
     synchronize: false,
     logging: true,
     migrations: ['src/migrations/*.ts'],

@@ -49,3 +49,96 @@ await todoRepo.save([
   { title: 'Example 1', completed: false },
   { title: 'Example 2', completed: true },
 ]);
+
+
+---
+これはリレーションを正しく理解・活用するうえで最高のステップです🙌
+早速やっていきましょう！
+
+🎯 目標
+GET /api/todos のレスポンスで、
+以下のように**user 情報も含めたJSON**を返す！
+
+json
+Copy
+Edit
+[
+  {
+    "id": 1,
+    "title": "Learn coding",
+    "completed": false,
+    "user": {
+      "id": 1,
+      "name": "Yuta"
+    }
+  }
+]
+✅ ステップ
+① User エンティティに @Entity() ついていることを確認
+ts
+Copy
+Edit
+// src/models/User.ts
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Todo } from "./Todo";
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column()
+  name!: string;
+
+  @OneToMany(() => Todo, todo => todo.user)
+  todos!: Todo[];
+}
+② Todo エンティティ側で @ManyToOne を設定済みであること
+ts
+Copy
+Edit
+// src/models/Todo.ts
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { User } from "./User";
+
+@Entity()
+export class Todo {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column()
+  title!: string;
+
+  @Column({ default: false })
+  completed!: boolean;
+
+  @ManyToOne(() => User, user => user.todos)
+  user!: User;
+}
+③ コントローラーで relations: ['user'] を指定する！
+ts
+Copy
+Edit
+// src/controllers/todoController.ts
+import { AppDataSource } from "../../ormconfig";
+import { Todo } from "../models/Todo";
+import { Request, Response } from "express";
+
+export const getTodos = async (req: Request, res: Response) => {
+  try {
+    const todoRepo = AppDataSource.getRepository(Todo);
+    const todos = await todoRepo.find({
+      relations: ['user']  // ← ここを追加！
+    });
+    res.json(todos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching todos", error });
+  }
+};
+④ Postman or curl で確認！
+bash
+Copy
+Edit
+curl http://localhost:3000/api/todos
+👀 user オブジェクト付きのレスポンスが返ってくれば大成功！
