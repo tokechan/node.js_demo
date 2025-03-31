@@ -5,8 +5,9 @@ import { Todo } from '../models/Todo';
 import { User } from '../models/User';
 import { errorMessages } from './errorMessages';
 import { successMessages } from './successMessage'; 
-
-
+import { HttpStatusCode } from '../constants/httpStatusCodes';
+import { createTodoSchema, updateTodoSchema } from '../validations/todoSchema';
+import { z } from 'zod';
 
 export const getTodos = async (req: Request, res: Response) => {
     try {
@@ -19,25 +20,34 @@ export const getTodos = async (req: Request, res: Response) => {
             todos
         });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching todos", error });
+        console.error(
+            'Failed to fetch todos',
+            error
+        );
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessages.FAILED_TO_FETCH_TODOS });
     }
 };
 
-export const createTodo = async (req: Request, res: Response) => {
+export const createTodo = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { title, userId } = req.body;
+        const parsed = createTodoSchema.safeParse(req.body);
 
-        if(!title || !userId) {
-            return res.status(400).json({ error: errorMessages.TITLE_REQUIRED });
+        if(!parsed.success) {
+            const errors = parsed.error.flatten().fieldErrors;
+            return res.status(HttpStatusCode.BAD_REQUEST).json({ errors });
         }
 
+        
+        const { title, userId } = parsed.data;
+
+     
         const todoRepo = AppDataSource.getRepository(Todo);
         const userRepo = AppDataSource.getRepository(User);
 
         const user = await userRepo.findOneBy({id: userId });
 
         if(!user) {
-            return res.status(404).json({ error: errorMessages.USER_NOT_FOUND });
+            return res.status(HttpStatusCode.NOT_FOUND).json({ error: errorMessages.USER_NOT_FOUND });
         }
 
         const newTodo = new Todo();
@@ -46,7 +56,7 @@ export const createTodo = async (req: Request, res: Response) => {
         newTodo.user = user;
 
         const saved = await todoRepo.save(newTodo);
-        res.status(201).json({
+        res.status(HttpStatusCode.CREATED).json({
             message: successMessages.TODO_CREATED,
             todo: saved
         });
@@ -55,22 +65,35 @@ export const createTodo = async (req: Request, res: Response) => {
             'Failed to create todo',
             error
         );
-        res.status(500).json({ error: errorMessages.FAILED_TO_CREATE_TODO });
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessages.FAILED_TO_CREATE_TODO });
     }
 };
 
 export const updateTodo: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const { title, completed } = req.body;
-
+   
     try {
+        const  { id } = req.params;
+
+        const parsed = updateTodoSchema.safeParse(req.body);
+        
+        if (!parsed.success) {
+            const errors = parsed.error.flatten().fieldErrors;
+            return res
+            .status(HttpStatusCode.BAD_REQUEST)
+            .json({ errors });
+        }
+
+
         const todoRepo = AppDataSource.getRepository(Todo);
         const todo = await todoRepo.findOneBy({ id: Number(id) });
 
         if (!todo) {
-            return res.status(404).json({ error: errorMessages.TODO_NOT_FOUND });
+            return res
+            .status(HttpStatusCode.NOT_FOUND)
+            .json({ error: errorMessages.TODO_NOT_FOUND });
         }
 
+        const { title, completed } = parsed.data;
         if (title !== undefined) todo.title = title;
         if (completed !== undefined) todo.completed = completed;
 
@@ -80,8 +103,13 @@ export const updateTodo: RequestHandler = async (req: Request, res: Response, ne
             todo: updatedTodo
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: errorMessages.FAILED_TO_UPDATE_TODO });
+        console.error(
+            'Failed to update todo',
+            error
+        );
+        res
+        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .json({ error: errorMessages.FAILED_TO_UPDATE_TODO });
     }
 };
 
@@ -93,17 +121,17 @@ export const deleteTodo: RequestHandler = async (req: Request, res: Response, ne
         const todo = await todoRepo.findOneBy({ id: Number(id) });
 
         if (!todo) {
-            return res.status(404).json({ error: errorMessages.TODO_NOT_FOUND });
+            return res.status(HttpStatusCode.NOT_FOUND).json({ error: errorMessages.TODO_NOT_FOUND });
         }
 
         await todoRepo.remove(todo);
-        res.status(204).json({
+        res.status(HttpStatusCode.NO_CONTENT).json({
             message: successMessages.TODO_DELETED
         });
     
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: errorMessages.FAILED_TO_DELETE_TODO });   
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessages.FAILED_TO_DELETE_TODO });   
     }
 };
 
