@@ -1,4 +1,7 @@
+<<<<<<< HEAD
+=======
 // MySQL への接続設定
+>>>>>>> main
 import 'reflect-metadata';
 import { DataSource } from "typeorm";
 import { Todo } from './src/models/Todo';
