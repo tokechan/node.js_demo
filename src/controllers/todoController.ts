@@ -2,38 +2,37 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { AppDataSource } from '../../ormconfig';
 import { Todo } from '../models/Todo';
+import { User } from '../models/User';
 
 export const getTodos = async (req: Request, res: Response) => {
     try {
         const todoRepo = AppDataSource.getRepository(Todo);
-        const todos = await todoRepo.find();
+        const todos = await todoRepo.find({
+            relations: ['user']
+        });
         res.json(todos);
     } catch (error) {
         res.status(500).json({ message: "Error fetching todos", error });
     }
 };
 
-<<<<<<< HEAD
-// export const createTodo = async (req: Request, res: Response) => {
-//     try {
-//         const todoRepository = AppDataSource.getRepository(Todo);
-//         const todo = new Todo();
-//         todo.text = req.body.text;
-//         const newTodo = await todoRepository.save(todo);
-//         res.status(201).json(newTodo);
-//     } catch (error) {
-//         res.status(500).json({ message: "Error creating todo", error });
-//     }
-// };
-=======
 export const createTodo = async (req: Request, res: Response) => {
     try {
-        const { title } = req.body;
+        const { title, userId } = req.body;
+
         const todoRepo = AppDataSource.getRepository(Todo);
+        const userRepo = AppDataSource.getRepository(User);
+
+        const user = await userRepo.findOneBy({id: userId });
+
+        if(!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         const newTodo = new Todo();
         newTodo.title = title;
         newTodo.completed = false;
+        newTodo.user = user;
 
         const saved = await todoRepo.save(newTodo);
         res.status(201).json(saved);
@@ -87,4 +86,3 @@ export const deleteTodo: RequestHandler = async (req: Request, res: Response, ne
 };
 
     
->>>>>>> main
