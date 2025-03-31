@@ -153,3 +153,52 @@ curl http://localhost:3000/api/todos
 ✅ コードが読みやすくなる
 というメリットがあります！
 
+---
+✅ Zodでできること（今と対応させてみる）
+現在の実装	Zodを使った場合の対応	効果
+手動で title や userId を if (!...) でチェック	スキーマ定義で自動バリデーション	バリデーションを型と一緒に管理できる
+errorMessages を手動で返す	Zodの safeParse() を使って詳細なエラーを返す	フォーマットされたエラーが取れる
+ステータスコードを手動で管理	バリデーションエラーは自動で 400 返す仕組みにもできる	一貫したレスポンス設計が可能
+✅ たとえば Zod で POST /api/todos を検証する例
+📄 スキーマ定義
+ts
+Copy
+Edit
+// src/validations/todoSchema.ts
+import { z } from 'zod';
+
+export const createTodoSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  userId: z.number().int().positive('Valid userId is required'),
+});
+📄 Controller 側の使い方
+ts
+Copy
+Edit
+import { createTodoSchema } from '../validations/todoSchema';
+
+export const createTodo = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const parsed = createTodoSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        errors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    const { title, userId } = parsed.data;
+
+    // あとは今までと同じ流れで処理
+    ...
+  } catch (err) {
+    next(err);
+  }
+};
+✅ 今の構成にも自然に組み込める！
+express-validator より軽くて使いやすい
+
+TypeScriptと相性抜群（型安全・補完が強い）
+
+Controllerの冒頭で safeParse → 不正なら即 400 返す
+
