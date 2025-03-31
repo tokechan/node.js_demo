@@ -10,4 +10,7 @@ export class Todo {
 
     @Column({ default: false})
     completed!: boolean;
+
+    @Column({ type: 'datetime', nullable: true })
+    dueDate: Date | null = null;
 }
