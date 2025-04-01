@@ -11,3 +11,12 @@ export const updateTodoSchema = z.object({
     title: z.string().min(1, { message: 'Title is required' }).optional(),
     completed: z.boolean().optional(),
 });
+
+
+export const todoIdParamSchema = z.object({
+    id: z
+      .string()
+      .regex(/^\d+$/, { message: 'Invalid ID format' })
+      .transform(Number),
+  });
+  

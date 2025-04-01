@@ -7,7 +7,7 @@ export const getAll = async () => {
     return await todoRepo.find();
 };
 
-export const create = async (text: string) => {
-   const todo = todoRepo.create({ text });
+export const create = async (title: string, userId: number) => {
+   const todo = todoRepo.create({ title, completed: false, user: { id: userId } });
    return await todoRepo.save(todo);
 };

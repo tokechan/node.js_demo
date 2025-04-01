@@ -6,9 +6,8 @@ import { getTodos, createTodo, updateTodo, deleteTodo } from '../controllers/tod
 const router = Router();
 
 router.get('/', getTodos);
-router.post('/', createTodo);
-router.put('/:id', updateTodo as RequestHandler);
-router.delete('/:id', deleteTodo as RequestHandler);
-
+router.post('/', createTodo);         // ← OK！
+router.put('/:id', updateTodo);       // ← OK！
+router.delete('/:id', deleteTodo);    // ← OK！
 
 export default router;
