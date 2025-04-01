@@ -6,8 +6,8 @@ import { User } from '../models/User';
 import { errorMessages } from './errorMessages';
 import { successMessages } from './successMessage'; 
 import { HttpStatusCode } from '../constants/httpStatusCodes';
-import { createTodoSchema, updateTodoSchema } from '../validations/todoSchema';
-import { z } from 'zod';
+import { createTodoSchema, updateTodoSchema, todoIdParamSchema } from '../validations/todoSchema';
+
 
 export const getTodos = async (req: Request, res: Response) => {
     try {
@@ -69,7 +69,7 @@ export const createTodo = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const updateTodo: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const updateTodo = async (req: Request, res: Response, next: NextFunction) => {
    
     try {
         const  { id } = req.params;
@@ -113,24 +113,36 @@ export const updateTodo: RequestHandler = async (req: Request, res: Response, ne
     }
 };
 
-export const deleteTodo: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
-    const  { id } = req.params;
-
+export const deleteTodo = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const parsed = todoIdParamSchema.safeParse(req.params);
+        if(!parsed.success) {
+            const errors = parsed.error.flatten().fieldErrors;
+            return res.status(HttpStatusCode.BAD_REQUEST).json({ errors});
+        }
+
+        const  { id } = parsed.data;
+
         const todoRepo = AppDataSource.getRepository(Todo);
-        const todo = await todoRepo.findOneBy({ id: Number(id) });
+        const todo = await todoRepo.findOneBy({ id });
+        console.log('🧪 todo result:', todo); // ここで null/undefined か確認
+
 
         if (!todo) {
-            return res.status(HttpStatusCode.NOT_FOUND).json({ error: errorMessages.TODO_NOT_FOUND });
+            return res
+            .status(HttpStatusCode.NOT_FOUND)
+            .json({ error: errorMessages.TODO_NOT_FOUND });
         }
 
         await todoRepo.remove(todo);
         res.status(HttpStatusCode.NO_CONTENT).json({
             message: successMessages.TODO_DELETED
         });
-    
     } catch (error) {
-        console.error(error);
+        console.error(
+            'Failed to delete todo',
+            error
+        );
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessages.FAILED_TO_DELETE_TODO });   
     }
 };
