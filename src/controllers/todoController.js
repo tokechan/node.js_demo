@@ -17,20 +17,14 @@ const errorMessages_1 = require("./errorMessages");
 const successMessage_1 = require("./successMessage");
 const httpStatusCodes_1 = require("../constants/httpStatusCodes");
 const todoSchema_1 = require("../validations/todoSchema");
-const getTodos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getTodos = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const todoRepo = ormconfig_1.AppDataSource.getRepository(Todo_1.Todo);
-        const todos = yield todoRepo.find({
-            relations: ['user']
-        });
-        res.json({
-            message: successMessage_1.successMessages.TODO_FETCHED,
-            todos
-        });
+        //強制エラー起こすため一時的に書いてる
+        console.log("💥 ここ通ってるよ");
+        throw new Error('Failed to fetch todos');
     }
     catch (error) {
-        console.error('Failed to fetch todos', error);
-        res.status(httpStatusCodes_1.HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessages_1.errorMessages.FAILED_TO_FETCH_TODOS });
+        next(error);
     }
 });
 exports.getTodos = getTodos;

@@ -7,7 +7,7 @@ import { User } from './src/models/User';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
-    host: 'localhost', // Docker service name
+    host: 'db', // Docker service name
     port: 3306, // Internal port in the container
     username: 'root',
     password: 'password',
