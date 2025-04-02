@@ -1,5 +1,5 @@
 
-import { RequestHandler, Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from '../../ormconfig';
 import { Todo } from '../models/Todo';
 import { User } from '../models/User';
@@ -9,22 +9,22 @@ import { HttpStatusCode } from '../constants/httpStatusCodes';
 import { createTodoSchema, updateTodoSchema, todoIdParamSchema } from '../validations/todoSchema';
 
 
-export const getTodos = async (req: Request, res: Response) => {
+export const getTodos = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log("💥 ここ通ってるよ")
+
         const todoRepo = AppDataSource.getRepository(Todo);
-        const todos = await todoRepo.find({
-            relations: ['user']
-        });
+        console.log("💥 Repository acquired");
+        const todos = await todoRepo.find();
+        console.log("💥 Todos fetched", todos);
+
         res.json({
             message: successMessages.TODO_FETCHED,
             todos
         });
     } catch (error) {
-        console.error(
-            'Failed to fetch todos',
-            error
-        );
-        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: errorMessages.FAILED_TO_FETCH_TODOS });
+        console.error("💥 Error fetching todos:", error);
+        next(error);
     }
 };
 

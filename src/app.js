@@ -7,7 +7,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //app.ts が「Expressアプリの設計図」、index.ts が「その設計図から実行する建築作業」
 const express_1 = __importDefault(require("express"));
 const todoRoutes_1 = __importDefault(require("./routes/todoRoutes"));
+const errorHandler_1 = require("./middlewares/errorHandler");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use('/api/todos', todoRoutes_1.default);
+app.use(errorHandler_1.errorHandler); //必ずルーティングの後ろに書く
 exports.default = app;
